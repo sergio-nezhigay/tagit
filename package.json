@@ -1,0 +1,34 @@
+{
+  "name": "branded-demand-app",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "scripts": {
+    "shopify": "shopify",
+    "build": "shopify app build",
+    "dev": "shopify app dev",
+    "info": "shopify app info",
+    "generate": "shopify app generate",
+    "deploy": "shopify app deploy",
+    "dev:x": "shopify app dev"
+  },
+  "dependencies": {
+    "@remix-run/node": "^2.11.2",
+    "@remix-run/react": "^2.11.2",
+    "@shopify/polaris": "^13.9.0",
+    "graphql-prettier": "^1.0.6"
+  },
+  "trustedDependencies": [
+    "@shopify/plugin-cloudflare"
+  ],
+  "author": "user",
+  "private": true,
+  "workspaces": [
+    "extensions/*"
+  ],
+  "devDependencies": {
+    "eslint": "^9.9.0",
+    "eslint-plugin-react": "^7.35.0",
+    "globals": "^15.9.0",
+    "typescript-eslint": "^8.2.0"
+  }
+}
