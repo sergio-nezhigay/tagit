@@ -1,16 +1,12 @@
+type GraphQLResponse<T> = {
+  data?: T;
+  errors?: { message: string }[];
+};
+
 export async function getOrderDetails(
-  orderId: string,
-  query: <T, V>(
-    query: string,
-    options?: { variables?: V; version?: string }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ) => Promise<{ data?: T; errors?: any[] }>
-) {
-  const { data, errors } = await query<
-    { order: { id: string; name: string } },
-    { id: string }
-  >(
-    `#graphql
+  orderId: string
+): Promise<{ id: string; name: string; tags: string[] } | undefined> {
+  const query = `#graphql
       query Order($id: ID!) {
         order(id: $id) {
           id
@@ -22,11 +18,13 @@ export async function getOrderDetails(
           }
           tags
         }
-      }`,
-    {
-      variables: { id: orderId },
-    }
-  );
+      }`;
+
+  const variables = { id: orderId };
+
+  const { data, errors } = await makeGraphQLQuery<{
+    order: { id: string; name: string; tags: string[] };
+  }>(query, variables);
 
   if (errors) {
     throw new Error(
@@ -36,4 +34,37 @@ export async function getOrderDetails(
   }
 
   return data?.order;
+}
+
+export async function updateOrder({
+  value,
+  orderId,
+}: {
+  value: string;
+  orderId: string;
+}): Promise<void> {
+  console.log("==========updateOrder===============");
+  console.log(value, orderId);
+  console.log("====================================");
+}
+
+async function makeGraphQLQuery<T>(
+  query: string,
+  variables: Record<string, unknown>
+): Promise<GraphQLResponse<T>> {
+  const graphQLQuery = {
+    query,
+    variables,
+  };
+
+  const res = await fetch("shopify:admin/api/graphql.json", {
+    method: "POST",
+    body: JSON.stringify(graphQLQuery),
+  });
+
+  if (!res.ok) {
+    throw new Error("Network error");
+  }
+
+  return (await res.json()) as GraphQLResponse<T>;
 }

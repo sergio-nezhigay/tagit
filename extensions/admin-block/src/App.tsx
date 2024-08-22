@@ -1,41 +1,83 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   reactExtension,
   useApi,
   AdminBlock,
   Text,
+  InlineStack,
+  ProgressIndicator,
+  Select,
 } from "@shopify/ui-extensions-react/admin";
-import useOrderDetails from "./useOrderDetails";
+import { getOrderDetails, updateOrder } from "./getOrderDetails";
 
 const TARGET = "admin.order-details.block.render";
 
 export default reactExtension(TARGET, () => <App />);
 
 function App() {
-  const { data, query } = useApi(TARGET);
-  const { orderDetails, error } = useOrderDetails(data, query);
+  const { data } = useApi(TARGET);
+  const [loading, setLoading] = useState(true);
+  const [orderDetails, setOrderDetails] = useState("");
+  const [value, setValue] = useState("pending");
+  const [tags, setTags] = useState([]);
+  const orderId = data.selected[0].id;
 
-  if (error) {
-    return (
-      <AdminBlock>
-        <Text>Error: {error}</Text>
-      </AdminBlock>
-    );
-  }
+  useEffect(() => {
+    (async function getProductInfo() {
+      const details = await getOrderDetails(orderId);
+      setLoading(false);
+      setTags(details?.tags || []);
+      setOrderDetails(JSON.stringify(details, null, 2));
+    })();
+  }, [orderId]);
 
-  if (!orderDetails) {
-    return (
-      <AdminBlock>
-        <Text>Loading order details...</Text>
-        <Text>Order ID: {data?.selected?.[0]?.id || "N/A"}</Text>
-      </AdminBlock>
-    );
-  }
+  const onStatusChange = async (value: string) => {
+    setValue(value);
+    await updateOrder({ value, orderId });
+  };
 
-  return (
+  return loading ? (
+    <InlineStack blockAlignment="center" inlineAlignment="center">
+      <ProgressIndicator size="large-100" />
+    </InlineStack>
+  ) : (
     <AdminBlock>
-      <Text>Order Details:</Text>
+      <Text>Loaded order details42...</Text>
       <Text>{orderDetails}</Text>
+      {tags.map((tag) => (
+        <Text key={tag}>{tag}</Text>
+      ))}
+      <Select
+        label="Order Status"
+        value={value}
+        onChange={onStatusChange}
+        options={[
+          {
+            value: "pending",
+            label: "Pending",
+          },
+          {
+            value: "processing",
+            label: "Processing",
+          },
+          {
+            value: "shipped",
+            label: "Shipped",
+          },
+          {
+            value: "delivered",
+            label: "Delivered",
+          },
+          {
+            value: "cancelled",
+            label: "Cancelled",
+          },
+          {
+            value: "returned",
+            label: "Returned",
+          },
+        ]}
+      />
     </AdminBlock>
   );
 }
