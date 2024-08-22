@@ -8,7 +8,7 @@ import {
   ProgressIndicator,
   Select,
 } from "@shopify/ui-extensions-react/admin";
-import { getOrderDetails, updateOrder } from "./getOrderDetails";
+import { getOrderTags, updateOrderTags } from "./orderTagsOperations";
 
 const TARGET = "admin.order-details.block.render";
 
@@ -24,16 +24,16 @@ function App() {
 
   useEffect(() => {
     (async function getProductInfo() {
-      const details = await getOrderDetails(orderId);
+      const tags = await getOrderTags(orderId);
       setLoading(false);
-      setTags(details?.tags || []);
-      setOrderDetails(JSON.stringify(details, null, 2));
+      setTags(tags);
+      setOrderDetails(JSON.stringify(tags, null, 2));
     })();
   }, [orderId]);
 
   const onStatusChange = async (value: string) => {
     setValue(value);
-    await updateOrder({ value, orderId });
+    await updateOrderTags({ value, orderId });
   };
 
   return loading ? (
@@ -42,7 +42,7 @@ function App() {
     </InlineStack>
   ) : (
     <AdminBlock>
-      <Text>Loaded order details42...</Text>
+      <Text>Loaded order details1...</Text>
       <Text>{orderDetails}</Text>
       {tags.map((tag) => (
         <Text key={tag}>{tag}</Text>
