@@ -23,7 +23,7 @@ function App() {
   useEffect(() => {
     (async function getProductInfo() {
       const tags = await getOrderTags(orderId);
-      const currentstage = (tags && tags[0]) || "pending";
+      const currentstage = (tags && tags[0]) || stages[0].value;
       setLoading(false);
       setValue(currentstage);
       await updateOrderTags({ value: currentstage, orderId });
