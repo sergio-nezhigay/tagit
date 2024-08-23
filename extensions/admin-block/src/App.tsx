@@ -3,35 +3,34 @@ import {
   reactExtension,
   useApi,
   AdminBlock,
-  Text,
   InlineStack,
   ProgressIndicator,
   Select,
 } from "@shopify/ui-extensions-react/admin";
 import { getOrderTags, updateOrderTags } from "./orderTagsOperations";
+import { stages } from "./stages";
 
 const TARGET = "admin.order-details.block.render";
 
 export default reactExtension(TARGET, () => <App />);
 
 function App() {
-  const { data } = useApi(TARGET);
   const [loading, setLoading] = useState(true);
-  const [orderDetails, setOrderDetails] = useState("");
-  const [value, setValue] = useState("pending");
-  const [tags, setTags] = useState([]);
+  const [value, setValue] = useState("");
+  const { data } = useApi(TARGET);
   const orderId = data.selected[0].id;
 
   useEffect(() => {
     (async function getProductInfo() {
       const tags = await getOrderTags(orderId);
+      const currentstage = (tags && tags[0]) || "pending";
       setLoading(false);
-      setTags(tags);
-      setOrderDetails(JSON.stringify(tags, null, 2));
+      setValue(currentstage);
+      await updateOrderTags({ value: currentstage, orderId });
     })();
   }, [orderId]);
 
-  const onStatusChange = async (value: string) => {
+  const onStageChange = async (value: string) => {
     setValue(value);
     await updateOrderTags({ value, orderId });
   };
@@ -42,41 +41,11 @@ function App() {
     </InlineStack>
   ) : (
     <AdminBlock>
-      <Text>Loaded order details1...</Text>
-      <Text>{orderDetails}</Text>
-      {tags.map((tag) => (
-        <Text key={tag}>{tag}</Text>
-      ))}
       <Select
-        label="Order Status"
+        label="Change order stage"
         value={value}
-        onChange={onStatusChange}
-        options={[
-          {
-            value: "pending",
-            label: "Pending",
-          },
-          {
-            value: "processing",
-            label: "Processing",
-          },
-          {
-            value: "shipped",
-            label: "Shipped",
-          },
-          {
-            value: "delivered",
-            label: "Delivered",
-          },
-          {
-            value: "cancelled",
-            label: "Cancelled",
-          },
-          {
-            value: "returned",
-            label: "Returned",
-          },
-        ]}
+        onChange={onStageChange}
+        options={stages}
       />
     </AdminBlock>
   );
