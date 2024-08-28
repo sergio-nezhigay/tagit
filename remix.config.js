@@ -12,4 +12,5 @@ module.exports = {
     unstable_tailwind: true, // Enable Tailwind CSS integration
   },
   sourceMap: true, // Enable source maps for easier debugging
+  serverDependenciesToBundle: [/^remix-utils.*/],
 };

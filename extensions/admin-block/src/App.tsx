@@ -6,12 +6,13 @@ import {
   InlineStack,
   ProgressIndicator,
   Button,
+  Text,
   Select,
 } from "@shopify/ui-extensions-react/admin";
 import { getOrderTags, updateOrderTags } from "./orderTagsOperations";
- 
+
 import { stages } from "./stages";
-import { sendSms } from "./sendSms";
+//import { sendSms } from "./sendSms";
 
 const TARGET = "admin.order-details.block.render";
 
@@ -29,6 +30,7 @@ function App() {
       const currentstage = (tags && tags[0]) || stages[0].value;
       setLoading(false);
       setValue(currentstage);
+
       await updateOrderTags({ value: currentstage, orderId });
     })();
   }, [orderId]);
@@ -38,9 +40,9 @@ function App() {
     await updateOrderTags({ value, orderId });
   };
 
-  const onButton = async () => {
-    await sendSms("hello", "+380507025777");
-  };
+  //  const onButton = async () => {
+  //    await sendSms();
+  //  };
 
   return loading ? (
     <InlineStack blockAlignment="center" inlineAlignment="center">
@@ -54,14 +56,27 @@ function App() {
         onChange={onStageChange}
         options={stages}
       />
-      	<Button
-      onPress={() => {
-        onButton();
-        console.log('onPress event');
-      }}
-    >
-      Click here5
-    </Button>
+
+      <Button
+        onPress={async () => {
+          try {
+            const response = await fetch("/api/proxy-endpoint", {
+              method: "POST", // or 'GET', depending on your needs
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ key: "value" }), // Include this line if you're using POST
+            });
+
+            const data = await response.json();
+            console.log("Fetch successful:", data);
+          } catch (error) {
+            console.error("Fetch failed:", error);
+          }
+        }}
+      >
+        Click
+      </Button>
     </AdminBlock>
   );
 }

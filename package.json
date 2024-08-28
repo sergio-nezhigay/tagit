@@ -15,7 +15,8 @@
     "@remix-run/node": "^2.11.2",
     "@remix-run/react": "^2.11.2",
     "@shopify/polaris": "^13.9.0",
-    "graphql-prettier": "^1.0.6"
+    "graphql-prettier": "^1.0.6",
+    "remix-utils": "^7.6.0"
   },
   "trustedDependencies": [
     "@shopify/plugin-cloudflare"
@@ -26,6 +27,7 @@
     "extensions/*"
   ],
   "devDependencies": {
+    "@types/node": "^22.5.1",
     "eslint": "^9.9.0",
     "eslint-plugin-react": "^7.35.0",
     "globals": "^15.9.0",
