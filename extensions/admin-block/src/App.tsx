@@ -5,10 +5,13 @@ import {
   AdminBlock,
   InlineStack,
   ProgressIndicator,
+  Button,
   Select,
 } from "@shopify/ui-extensions-react/admin";
 import { getOrderTags, updateOrderTags } from "./orderTagsOperations";
+ 
 import { stages } from "./stages";
+import { sendSms } from "./sendSms";
 
 const TARGET = "admin.order-details.block.render";
 
@@ -35,6 +38,10 @@ function App() {
     await updateOrderTags({ value, orderId });
   };
 
+  const onButton = async () => {
+    await sendSms("hello", "+380507025777");
+  };
+
   return loading ? (
     <InlineStack blockAlignment="center" inlineAlignment="center">
       <ProgressIndicator size="large-100" />
@@ -47,6 +54,14 @@ function App() {
         onChange={onStageChange}
         options={stages}
       />
+      	<Button
+      onPress={() => {
+        onButton();
+        console.log('onPress event');
+      }}
+    >
+      Click here5
+    </Button>
     </AdminBlock>
   );
 }
